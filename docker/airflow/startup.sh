@@ -31,14 +31,6 @@ if [ ! -e $CONTAINER_ALREADY_INITIALIZED ]; then
 	  exit $status
         fi
 
-	# Pull Code from Git
-	#sudo -u airflow -H sh -c "git clone https://github.com/marcelmittelstaedt/BigData.git /home/airflow/BigData"
-
-	# Link Directories to Git Repo files
-	#sudo -u airflow -H sh -c "ln -s /home/airflow/BigData/exercises/winter_semester_2020-2021/05_airflow/python/ /home/airflow/airflow/python"
-	#sudo -u airflow -H sh -c "ln -s /home/airflow/BigData/exercises/winter_semester_2020-2021/05_airflow/dags/ /home/airflow/airflow/dags"
-	#sudo -u airflow -H sh -c "ln -s /home/airflow/BigData/exercises/winter_semester_2020-2021/05_airflow/plugins/ /home/airflow/airflow/plugins"
-
 else
     echo "Not first start of Container, no PostgreSQL or Airflow setup necessary."
 fi

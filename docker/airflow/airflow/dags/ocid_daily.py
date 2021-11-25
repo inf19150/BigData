@@ -25,7 +25,7 @@ daily_dag = DAG(
     default_args=args,
     description='Dag to be executed every day on 08:15, fetching diff',
     schedule_interval='15 08 * * *',
-	start_date=datetime(2021, 11, 15),
+    start_date=datetime(2021, 11, 15),
     catchup=False,
     max_active_runs=1
 )
@@ -35,7 +35,7 @@ download_diff_dataset = HttpDownloadOperator(
     task_id='download_diff',
     #download_uri='https://opencellid.org/ocid/downloads?token={}&type=diff&file=OCID-diff-cell-export-{{ ds }}-T000000.csv.gz'.format(API_KEY),
     download_uri='http://193.196.53.117/ocid/OCID-diff-cell-export-{{ ds }}-T000000.csv.gz',
-	save_to='/home/airflow/ocid/raw/ocid_diff_{{ ds }}.csv.gz',
+    save_to='/home/airflow/ocid/raw/ocid_diff_{{ ds }}.csv.gz',
     dag=daily_dag,
 )
 
@@ -57,6 +57,15 @@ clear_local_raw_import_dir = ClearDirectoryOperator(
 )
 
 
+# Move diff database to remote hdfs
+hdfs_put_ocid_diff = HdfsPutFileOperator(
+    task_id='upload_ocid_diff_hdfs',
+    local_file='/home/airflow/ocid/raw/ocid_diff_{{ ds }}.csv',
+    remote_file='/user/hadoop/ocid/work/ocid_diff_{{ ds }}.csv',
+    hdfs_conn_id='hdfs',
+    dag=daily_dag,
+)
+
 pyspark_ocid_diff_to_final = SparkSubmitOperator(
     task_id='pyspark_filter_reduce_diff_write_to_final_parquet',
     conn_id='spark',
@@ -68,12 +77,12 @@ pyspark_ocid_diff_to_final = SparkSubmitOperator(
     name='spark_raw_to_final_diff',
     verbose=True,
     application_args=[
-					'--year', '{{ macros.ds_format(ds, "%Y-%m-%d", "%Y")}}',
-					'--month', '{{ macros.ds_format(ds, "%Y-%m-%d", "%m")}}',
-					'--day',  '{{ macros.ds_format(ds, "%Y-%m-%d", "%d")}}',
-					'--hdfs_source_dir', '/user/hadoop/ocid/work/',
-					'--hdfs_target_dir', '/user/hadoop/ocid/final/',
-					],
+        '--year', '{{ macros.ds_format(ds, "%Y-%m-%d", "%Y")}}',
+        '--month', '{{ macros.ds_format(ds, "%Y-%m-%d", "%m")}}',
+        '--day',  '{{ macros.ds_format(ds, "%Y-%m-%d", "%d")}}',
+        '--hdfs_source_dir', '/user/hadoop/ocid/work/',
+        '--hdfs_target_dir', '/user/hadoop/ocid/final/',
+    ],
     dag=daily_dag
 )
 

@@ -25,7 +25,7 @@ initial_dag = DAG(
     default_args=args,
     description='Initial DAG of OpenCellID (fetching initial dataset)',
     schedule_interval='@once',
-	start_date=datetime(2021, 11, 15),
+    start_date=datetime(2021, 11, 15),
     catchup=False,
     max_active_runs=1
 )
@@ -42,7 +42,7 @@ create_local_import_dir = BashOperator(
 
 
 # Create a corresponding directory, where the extracted raw-data (csv-file) is later being uploaded to
-create_remote_hdfs_dir_raw= HdfsMkdirFileOperator(
+create_remote_hdfs_dir_raw = HdfsMkdirFileOperator(
     task_id='mkdir_hdfs_ocid_raw_dir',
     directory='/user/hadoop/ocid/work/',
     hdfs_conn_id='hdfs',
@@ -51,7 +51,7 @@ create_remote_hdfs_dir_raw= HdfsMkdirFileOperator(
 
 
 # Create a corresponding directory, where the reduced final-data (as table) is later being stored to
-create_remote_hdfs_dir_final= HdfsMkdirFileOperator(
+create_remote_hdfs_dir_final = HdfsMkdirFileOperator(
     task_id='mkdir_hdfs_ocid_final_dir',
     directory='/user/hadoop/ocid/final/',
     hdfs_conn_id='hdfs',
@@ -62,8 +62,8 @@ create_remote_hdfs_dir_final= HdfsMkdirFileOperator(
 # Download full database from ocid to local file on airflow fs
 download_initial_dataset = HttpDownloadOperator(
     task_id='download_initial',
-    #download_uri='https://opencellid.org/ocid/downloads?token={}&type=full&file=cell_towers.csv.gz'.format(API_KEY),
-	download_uri='http://193.196.53.117/ocid/cell_towers.csv.gz',
+    # download_uri='https://opencellid.org/ocid/downloads?token={}&type=full&file=cell_towers.csv.gz'.format(API_KEY),
+    download_uri='http://193.196.53.117/ocid/cell_towers.csv.gz',
     save_to='/home/airflow/ocid/raw/ocid_full_{{ ds }}.csv.gz',
     dag=initial_dag,
 )
@@ -88,15 +88,6 @@ hdfs_put_ocid_initial = HdfsPutFileOperator(
 )
 
 
-# Move diff database to remote hdfs
-hdfs_put_ocid_diff= HdfsPutFileOperator(
-    task_id='upload_ocid_diff_hdfs',
-    local_file='/home/airflow/ocid/raw/ocid_diff_{{ ds }}.csv',
-    remote_file='/user/hadoop/ocid/work/ocid_diff_{{ ds }}.csv',
-    hdfs_conn_id='hdfs',
-    dag=initial_dag,
-)
-
 pyspark_ocid_full_to_final = SparkSubmitOperator(
     task_id='pyspark_filter_reduce_full_write_to_final_parquet',
     conn_id='spark',
@@ -108,20 +99,20 @@ pyspark_ocid_full_to_final = SparkSubmitOperator(
     name='spark_raw_to_final_full',
     verbose=True,
     application_args=[
-					'--year', '{{ macros.ds_format(ds, "%Y-%m-%d", "%Y")}}',
-					'--month', '{{ macros.ds_format(ds, "%Y-%m-%d", "%m")}}',
-					'--day',  '{{ macros.ds_format(ds, "%Y-%m-%d", "%d")}}',
-					'--hdfs_source_dir', '/user/hadoop/ocid/work/',
-					'--hdfs_target_dir', '/user/hadoop/ocid/final/',
-					],
+        '--year', '{{ macros.ds_format(ds, "%Y-%m-%d", "%Y")}}',
+        '--month', '{{ macros.ds_format(ds, "%Y-%m-%d", "%m")}}',
+        '--day',  '{{ macros.ds_format(ds, "%Y-%m-%d", "%d")}}',
+        '--hdfs_source_dir', '/user/hadoop/ocid/work/',
+        '--hdfs_target_dir', '/user/hadoop/ocid/final/',
+    ],
     dag=initial_dag
 )
 
 
 # Initial-Dag flow
-create_local_import_dir 
+create_local_import_dir
 
 create_local_import_dir >> create_remote_hdfs_dir_raw >> create_remote_hdfs_dir_final
-create_local_import_dir >> download_initial_dataset >> unzip_initial_dataset 
+create_local_import_dir >> download_initial_dataset >> unzip_initial_dataset
 
 unzip_initial_dataset >> hdfs_put_ocid_initial >> pyspark_ocid_full_to_final

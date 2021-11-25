@@ -1,0 +1,51 @@
+version: '3.3'
+services:
+    hadoop:
+        container_name: hadoop
+        ports:
+            - '8088:8088'
+            - '9870:9870'
+            - '9864:9864'
+            - '10000:10000'
+            - '8032:8032'
+            - '8030:8030'
+            - '8031:8031'
+            - '9000:9000'
+            - '8888:8888'
+        build:
+          context: ./spark_base
+          dockerfile: Dockerfile
+        #image: 'marcelmittelstaedt/spark_base:latest'
+        restart: 'always'
+    airflow:
+        container_name: airflow
+        ports:
+            - '8080:8080'
+        build:
+          context: ./airflow
+          dockerfile: Dockerfile
+        #image: 'marcelmittelstaedt/airflow:latest'
+    mysql:
+        build:
+          context: ./mysql
+          dockerfile: Dockerfile
+        environment:
+            - MYSQL_ROOT_PASSWORD=bigdata2021
+        container_name: mysql
+        ports:
+            - "3306:3306"
+        #volumes:
+        #    - mysql-data:/var/lib/mysql
+        #image: mysql
+    node-red:
+       container_name: nodered
+       build:
+           context: ./nodered
+           dockerfile: Dockerfile
+       #image: nodered/node-red
+       environment:
+           - TZ=Europe/Amsterdam
+       ports:
+           - "1880:1880"
+       #volumes:
+       #    - node-red-data:/data

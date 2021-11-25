@@ -1,7 +1,5 @@
 FROM ubuntu:18.04
 
-MAINTAINER Marcel Mittelstaedt <marcel.mittelstaedt@datawhizz.io>
-
 # Install All Necessary APT Packages
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
@@ -53,6 +51,11 @@ RUN pip3 install --upgrade pip \
 
 # Copy Airflow Config
 COPY --chown=airflow airflow.cfg /home/airflow/airflow/airflow.cfg
+
+# Copy DAGs, Python scripts & plugins
+COPY --chown=airflow ./airflow/dags/ /home/airflow/airflow/dags
+COPY --chown=airflow ./airflow/plugins/ /home/airflow/airflow/plugins
+COPY --chown=airflow ./airflow/python/ /home/airflow/airflow/python
 
 # Switch back to Root User
 USER root

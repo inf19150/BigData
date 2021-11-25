@@ -25,7 +25,7 @@ initial_dag = DAG(
     default_args=args,
     description='Initial DAG of OpenCellID (fetching initial dataset)',
     schedule_interval='@once',
-    start_date=datetime(2021, 11, 15),
+    start_date=datetime(2021, 11, 25),
     catchup=False,
     max_active_runs=1
 )

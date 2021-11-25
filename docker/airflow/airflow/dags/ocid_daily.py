@@ -25,7 +25,7 @@ daily_dag = DAG(
     default_args=args,
     description='Dag to be executed every day on 08:15, fetching diff',
     schedule_interval='15 08 * * *',
-    start_date=datetime(2021, 11, 15),
+    start_date=datetime(2021, 11, 25),
     catchup=False,
     max_active_runs=1
 )

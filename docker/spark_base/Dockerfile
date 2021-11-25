@@ -20,6 +20,9 @@ COPY yarn-site.xml hadoop/etc/hadoop/yarn-site.xml
 COPY core-site.xml hadoop/etc/hadoop/core-site.xml
 COPY hive-site.xml /home/hadoop/spark/conf/hive-site.xml
 
+# Add mysql-connector
+COPY mysql-connector-java-8.0.27.jar /home/hadoop/spark/jars/mysql-connector-java-8.0.27.jar
+
 RUN mkdir /home/hadoop/.jupyter/ 
 COPY jupyter_notebook_config.py /home/hadoop/.jupyter/jupyter_notebook_config.py 
 

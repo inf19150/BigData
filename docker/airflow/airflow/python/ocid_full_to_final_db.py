@@ -36,8 +36,7 @@ if __name__ == '__main__':
 
     # Initialize Spark Context
     sc = pyspark.SparkContext()
-    spark = SparkSession(sc).config("spark.driver.extraClassPath",
-                                    "/home/hadoop/spark/jars/mysql-connector-java-8.0.27.jar")
+    spark = SparkSession(sc)
 
     # Read full-table from csv-file
     schema = StructType(

@@ -56,7 +56,6 @@ clear_local_raw_import_dir = ClearDirectoryOperator(
     dag=daily_dag,
 )
 
-
 # Move diff database to remote hdfs
 hdfs_put_ocid_diff = HdfsPutFileOperator(
     task_id='upload_ocid_diff_hdfs',
@@ -87,4 +86,6 @@ pyspark_ocid_diff_to_final = SparkSubmitOperator(
 )
 
 # Daily-Dag flow
-clear_local_raw_import_dir >> download_diff_dataset >> unzip_diff_dataset >> hdfs_put_ocid_diff >> pyspark_ocid_diff_to_final
+clear_local_raw_import_dir
+clear_local_raw_import_dir >> download_diff_dataset >> unzip_diff_dataset
+unzip_diff_dataset >> hdfs_put_ocid_diff >> pyspark_ocid_diff_to_final

@@ -57,8 +57,6 @@ if __name__ == '__main__':
             StructField("averageSignal", IntegerType(), True)
         ])
 
-    date_str = "2021-11-24"
-
     df_diff = spark.read.format("csv").options(
         header="true",
         delimiter=",",

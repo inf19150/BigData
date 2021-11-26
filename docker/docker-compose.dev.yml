@@ -2,26 +2,47 @@ version: '3.3'
 services:
     hadoop:
         image: 'dressni/big_data:spark_base'
-        container_name: hadoop     
+        container_name: hadoop
+        build:
+          context: ./spark_base
+          dockerfile: Dockerfile        
         ports:
+            - '8088:8088'
             - '9870:9870'
+            - '9864:9864'
+            - '10000:10000'
+            - '8032:8032'
+            - '8030:8030'
+            - '8031:8031'
+            - '9000:9000'
             - '8888:8888'
         restart: 'always'
     airflow:
         image: 'dressni/big_data:airflow'
         container_name: airflow
+        build:
+          context: ./airflow
+          dockerfile: Dockerfile
         ports:
             - '8080:8080'
         restart: 'always'
     mysql:
         image: 'dressni/big_data:mysql'
         container_name: mysql
+        build:
+          context: ./mysql
+          dockerfile: Dockerfile
         environment:
             - MYSQL_ROOT_PASSWORD=bigdata2021
+        ports:
+            - "3306:3306"
         restart: 'always'
     node-red:
        image: 'dressni/big_data:node-red'
        container_name: nodered
+       build:
+           context: ./nodered
+           dockerfile: Dockerfile
        environment:
            - TZ=Europe/Amsterdam
        ports:

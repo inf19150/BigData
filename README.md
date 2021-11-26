@@ -183,8 +183,36 @@
     )
 
  </details>
- 
-### Explanation
+  
+### Explanation of Cell_Coverage_initial DAG
+
+This Dag shall run only once, fetching the complete dataset (zip-file), extracting it, uploading to hdfs, reducing, parition and filter and finally append initially to local and remote database.
+
+This DAG consists of the following tasks:
+
+|ID|Description|
+|-|-|
+|create_local_import_dir|Create a local direoctory within airflow, where the raw-data gets downloaded to|
+|create_remote_hdfs_dir_raw|Create a corresponding directory, where the extracted raw-data (csv-file) is later being uploaded to|
+|create_remote_hdfs_dir_final|Create a corresponding directory, where the reduced final-data (as table) is later being stored to|
+|download_initial_dataset|Download full database from ocid to local file on airflow fs|
+|unzip_initial_dataset|Unzip full database tgz-file to csv file on airflow fs|
+|hdfs_put_ocid_initial|Move extracted full database to remote hdfs|
+|pyspark_ocid_full_to_final|Filter only germany, based on coordinates, partition by radio-type (GSM, UMTS, LTE) and move to final table (hdfs-parquet) as well as external mysql-db|
+
+### Explanation of Cell_Coverage_daily DAG
+
+This Dag shall run daily, fetching only the current diff (zip-file), extracting it, uploading to hdfs, reducing, parition and filter and finally append to local and remote database.
+
+This DAG consists of the following tasks:
+
+|ID|Description|
+|-|-|
+|download_diff_dataset|Download diff database from ocid to local file on airflow fs|
+|unzip_diff_dataset|Unzip diff database tgz-file to csv file on airflow fs|
+|clear_local_raw_import_dir|Clear local files within raw-directory on airflow fs|
+|hdfs_put_ocid_diff|Move diff database to remote hdfs|
+|pyspark_ocid_diff_to_final|Filter only germany, based on coordinates, partition by radio-type (GSM, UMTS, LTE) and append to final table (hdfs-parquet) as well as external mysql-db|
 
 ## Software-Design
 ### Docker-Stack

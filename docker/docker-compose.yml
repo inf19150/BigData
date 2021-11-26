@@ -15,7 +15,7 @@ services:
         build:
           context: ./spark_base
           dockerfile: Dockerfile
-        #image: 'marcelmittelstaedt/spark_base:latest'
+        image: 'dressni/big_data:spark_base'
         restart: 'always'
     airflow:
         container_name: airflow
@@ -24,7 +24,7 @@ services:
         build:
           context: ./airflow
           dockerfile: Dockerfile
-        #image: 'marcelmittelstaedt/airflow:latest'
+        image: 'dressni/big_data:airflow'
     mysql:
         build:
           context: ./mysql
@@ -36,13 +36,13 @@ services:
             - "3306:3306"
         #volumes:
         #    - mysql-data:/var/lib/mysql
-        #image: mysql
+        image: 'dressni/big_data:mysql'
     node-red:
        container_name: nodered
        build:
            context: ./nodered
            dockerfile: Dockerfile
-       #image: nodered/node-red
+       image: 'dressni/big_data:node-red'
        environment:
            - TZ=Europe/Amsterdam
        ports:
